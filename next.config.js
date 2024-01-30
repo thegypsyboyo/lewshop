@@ -7,6 +7,9 @@ const nextConfig = {
     includePaths: [path.join(__dirname, "styles")],
     prependData: `@import "./base.scss";`,
   },
+  image: {
+    domains: ['upload.wikimedia.org'],
+  },
 };
 
 module.exports = nextConfig;
