@@ -1,13 +1,16 @@
 import Header from "../components/header"
 import Footer from "../components/footer"
 import axios from "axios";
-
+import { useSession, signIn, signOut } from "next-auth/react"
 
 export default function Home({ country}) {
-  console.log("Country:", country)
+
+  const { data: session } = useSession() 
+
   return (
     <div className="">
       <Header country={country} />
+      {session ? "you are logged in": "you are not logged in "}
       <Footer country={country} />
     </div>
   );
@@ -25,9 +28,14 @@ export async function getServerSideProps() {
 
   return { 
     props: {
+      // country: { 
+      //   name: data?.name, 
+      //   flag: data?.flag?.emojitwo 
+      // },
       country: { 
-        name: data.name, 
-        flag: data.flag.emojitwo },
+        name: "Kenya", 
+        flag: "https://cdn.ipregistry.co/flags/emojitwo/ke.svg"
+      },
     },
    };
 }
