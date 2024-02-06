@@ -5,6 +5,7 @@ import GithubProvider from "next-auth/providers/github"
 import EmailProvider from "next-auth/providers/email"
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
 import clientPromise from "./lib/mongodb"
+import Auth0Provider from "next-auth/providers/auth0"
 
 export default NextAuth({
   adapter: MongoDBAdapter(clientPromise),
@@ -23,6 +24,11 @@ export default NextAuth({
     GithubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
+    }),
+    Auth0Provider({
+      clientId: process.env.AUTH0_CLIENT_ID,
+      clientSecret: process.env.AUTH0_CLIENT_SECRET,
+      issuer: process.env.AUTH0_ISSUER,
     }),
     // Sign in with passwordless email link
     // EmailProvider({
