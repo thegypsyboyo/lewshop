@@ -1,7 +1,13 @@
 import React from 'react'
+import Header from "../components/header"
+import Footer from '../components/footer'
 
 export default function Signin() {
   return (
-    <div>signin</div>
+    <div>
+      <Header country={""}/>
+      Something goes here
+      <Footer country={"Kenya"}/>
+    </div>
   )
 }
