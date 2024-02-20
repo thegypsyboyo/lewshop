@@ -13,6 +13,7 @@ import Footer from '../components/footer'
 import LoginInput from '../components/inputs/logininput';
 import CircledIconBtn from '../components/buttons/circledIconBtn';
 import { getProviders, signIn } from 'next-auth/react';
+import axios from 'axios';
 
 const initialValue = {
   login_email: "",
@@ -21,13 +22,15 @@ const initialValue = {
   email: "",
   password: "",
   conf_password: "",
+  success: "",
+  error: "",
 }
 
 export default function Signin({ providers }) {
   console.log(providers)
   const [ user, setUser ] = useState(initialValue);
-
-  const { login_email, login_password, name, email, conf_password, password  } = user
+  const [loading, setLoading] = useState(false)
+  const { login_email, login_password, name, email, conf_password, password, error, success } = user
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,6 +67,23 @@ export default function Signin({ providers }) {
     name: "Morocco",
     flag: "https://cdn-icons-png.flaticon.com/512/197/197551.png?w=360",
   };
+
+  const signUpHandler =  async () => {
+    try {
+      setLoading(true);
+      const {data} = await axios.post("/api/auth/signup", {
+        name,
+        email,
+        password,
+      });
+      setUser({ ...user, error: "",  success: data.message});
+      setLoading(false);
+    } catch (error) {
+      setLoading(false)
+      setUser({ ...user, success:"",  error: error.response.data.message})
+    }
+  }
+
   return (
     <div>
       <Header country={country}/>
@@ -155,7 +175,9 @@ export default function Signin({ providers }) {
                 conf_password
               }}
               validationSchema={registrationValidation}
-              onSubmit={() => { }}
+              onSubmit={() => {
+                signUpHandler();
+               }}
             >
               {(form) => (
                 <Form>
@@ -191,6 +213,8 @@ export default function Signin({ providers }) {
                 </Form>
               )}
             </Formik>
+            <div>{success && <span>{success}</span>}</div>
+            <div>{error && <span>{error}</span>}</div>
           </div>
         </div>
       </div>

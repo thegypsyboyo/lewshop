@@ -9,11 +9,13 @@ import { validateEmail } from '../../../utils/validation';
 
 import User from "../../../models/User"
 import { createActivationToken } from '../../../utils/token';
+import { sendEmail } from '../../../utils/sendEmails';
 
 const handler = nc();
 
 handler.post(async (req,res)=> {
     try {
+        // Connect to DB first...
         await db.connectDb();
         const { name, email, password } = req.body
         
@@ -41,9 +43,16 @@ handler.post(async (req,res)=> {
         const activation_token = createActivationToken({
             id: addedUser._id.toString(),
         });
-        
-        console.log(req.body);
-        res.send(activation_token);
+
+        const url = `${process.env.BASE_URL}/activate/${activation_token}`
+
+        sendEmail(email, url,"", "Activate your account")
+
+        // Now disconnect DB and give a proper message
+        await db.disconnectDb();
+        res.json({
+            message: "Registration Successful! Please activate your account email to start"
+        })
         
     } catch (error) {
         res.status(500).json({message:error.message})
