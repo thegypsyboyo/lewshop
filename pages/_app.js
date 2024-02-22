@@ -6,6 +6,7 @@ import store from "../store"
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
 import Head from "next/head";
+import Header from "../components/header"
 
 let persistor = persistStore(store);
 
@@ -25,6 +26,7 @@ export default function App({
       <SessionProvider session={session}>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
+            {/* <Header country={"Kenya"} /> */}
             <Component  {...pageProps} />
           </PersistGate>
         </Provider>

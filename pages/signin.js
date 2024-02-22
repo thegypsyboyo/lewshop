@@ -13,7 +13,7 @@ import Header from "../components/header"
 import Footer from '../components/footer'
 import LoginInput from '../components/inputs/logininput';
 import CircledIconBtn from '../components/buttons/circledIconBtn';
-import { getProviders, signIn } from 'next-auth/react';
+import { getCsrfToken, getProviders, getSession, signIn } from 'next-auth/react';
 import axios from 'axios';
 import DotLoad from '../components/loaders/dotLoader';
 import DotLoaderSpinner from '../components/loaders/dotLoader';
@@ -30,7 +30,7 @@ const initialValue = {
   login_error: ""
 }
 
-export default function Signin({ providers }) {
+export default function Signin({ providers, csrfToken, callbackUrl }) {
   console.log(providers)
   const [user, setUser] = useState(initialValue);
   const [loading, setLoading] = useState(false)
@@ -111,7 +111,7 @@ export default function Signin({ providers }) {
       setLoading(false);
       setUser({ ...user, login_error: res?.error });
     } else {
-      return Router.push("/");
+      return Router.push(callbackUrl || "/");
     }
   }
 
@@ -149,7 +149,13 @@ export default function Signin({ providers }) {
                 }}
               >
                 {(form) => (
-                  <Form>
+                  <Form method='post' action='/api/auth/signin/email'>
+                    <input 
+                    type='hidden' 
+                    name="csrfToken"
+                    defaultValue={csrfToken}
+                    />
+                    
                     <LoginInput
                       type="text"
                       name="login_email"
@@ -266,9 +272,25 @@ export default function Signin({ providers }) {
 }
 
 export async function getServerSideProps(context) {
+
+  const { req, query } = context;
+
+  const session = await getSession({ req });
+
+  const {callbackUrl} = query;
+
+  if (session) {
+    return {
+      redirect: {
+        destination: callbackUrl,
+      },
+    };
+  }
+  const csrfToken = await getCsrfToken(context)
   const providers = Object.values(await getProviders());
 
+
   return {
-    props: { providers },
+    props: { providers, csrfToken, callbackUrl },
   }
 }
