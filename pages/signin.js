@@ -27,13 +27,14 @@ const initialValue = {
   conf_password: "",
   success: "",
   error: "",
+  login_error: ""
 }
 
 export default function Signin({ providers }) {
   console.log(providers)
   const [user, setUser] = useState(initialValue);
   const [loading, setLoading] = useState(false)
-  const { login_email, login_password, name, email, conf_password, password, error, success } = user
+  const { login_email, login_password, name, email, conf_password, password, error, success, login_error } = user
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,7 +82,13 @@ export default function Signin({ providers }) {
       });
       setUser({ ...user, error: "", success: data.message });
       setLoading(false);
-      setTimeout(() => {
+      setTimeout( async () => {
+        let options = {
+          redirect: false,
+          email: email,
+          password: password,
+        };
+        const res = await signIn("credentials", options);
         Router.push("/");
       }, 2000);
     } catch (error) {
@@ -90,11 +97,29 @@ export default function Signin({ providers }) {
     }
   }
 
+  const signInHandler = async () => {
+    setLoading(true);
+    let options = {
+      redirect: false,
+      email: login_email,
+      password: login_password,
+    };
+    const res = await signIn("credentials", options);
+    setUser({ ...user, success: "", error: "" });
+    setLoading(false);
+    if (res?.error) {
+      setLoading(false);
+      setUser({ ...user, login_error: res?.error });
+    } else {
+      return Router.push("/");
+    }
+  }
+
   return (
     <>
-    {
-      loading && <DotLoaderSpinner loading={loading}/>
-    }
+      {
+        loading && <DotLoaderSpinner loading={loading} />
+      }
       <div>
         <Header country={country} />
         <div className={styles.login}>
@@ -119,6 +144,9 @@ export default function Signin({ providers }) {
                   login_password,
                 }}
                 validationSchema={loginValidation}
+                onSubmit={() => {
+                  signInHandler()
+                }}
               >
                 {(form) => (
                   <Form>
@@ -141,6 +169,9 @@ export default function Signin({ providers }) {
                       text={"Sign in "}
                       type={"submit"}
                     />
+                    {login_error && (
+                      <span className={styles.error}>{login_error}</span>
+                    )}
                     <div className={styles.forgot}>
                       <Link href={"/forgot"}>Forgot password ?</Link>
                     </div>
