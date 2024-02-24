@@ -46,7 +46,7 @@ handler.post(async (req,res)=> {
 
         const url = `${process.env.BASE_URL}/activate/${activation_token}`
 
-        sendEmail(email, url,"", "Activate your account")
+        sendEmail(email, url,"", "Activate your account", activateEmailTemplate)
 
         // Now disconnect DB and give a proper message
         await db.disconnectDb();
