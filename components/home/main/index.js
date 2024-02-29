@@ -1,14 +1,18 @@
+import Header from "./Header"
+import Menu from "./Menu"
 import SwiperMain from "./Swiper"
+import User from "./User"
+import Offers from "./offers"
 import styles from "./styles.module.scss"
 
 export default function Main() {
   return (
     <div className={styles.main}>
-        <div className={styles.header}>header</div>
-        <div className={styles.menu}>menu</div>
+        <Header />
+        <Menu />
         <SwiperMain />
-        <div className={styles.offers}>offers</div>
-        <div className={styles.user}>user</div>
+        <Offers />
+        <User />
     </div>
   )
 }
