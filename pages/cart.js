@@ -1,12 +1,26 @@
-import React from 'react'
-import Header from "../components/header"
-const cart = () => {
+import Empty from '../components/cart/empty';
+import Header from '../components/cart/header'
+
+import styles from "../styles/cart.module.scss"
+
+export default function Cart() {
+  const cart = [];
+
   return (
-    <div>
-        <Header country={"J"}/>
-        cart page
-    </div>
+    <>
+      <Header />
+      <div className={styles.cart}>
+        { cart.length > 1 ? (
+          <div className={styles.cart__container}>
+            Cart Object
+          </div>
+        ): (
+          <div className={styles.empty}>
+            <Empty/>
+          </div>
+        )}
+      </div>
+    </>
+
   )
 }
-
-export default cart
