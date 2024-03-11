@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styles from "./styles.module.scss"
-import { compareArrays } from '../../utils/array_utils';
+import { compareArrays } from '../../../utils/array_utils';
 
 export default function CartHeader({ cartItems, selected
 , setSelected }) {

@@ -3,7 +3,7 @@ import { BsHeart } from "react-icons/bs";
 import { AiOutlineDelete } from "react-icons/ai";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { updateCart } from "../../store/cartSlice";
+import { updateCart } from "../../../store/cartSlice";
 import { useEffect, useState } from "react";
 
 

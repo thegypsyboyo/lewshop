@@ -2,10 +2,13 @@ import { useSelector } from 'react-redux';
 import Empty from '../components/cart/empty';
 import Header from '../components/cart/header'
 
+import PaymentMethods from "../components/cart/paymentMethods";
 import styles from "../styles/cart.module.scss"
-import Product from '../store/product';
-import CartHeader from '../store/cartHeader';
-import Checkout from '../store/checkout';
+import Product from "../components/cart/product"
+import CartHeader from '../components/cart/cartHeader';
+import Checkout from "../components/cart/checkout";
+import ProductsSwiper from "../components/productsSwiper";
+import { women_swiper } from "../data/home";
 import { useEffect, useState } from 'react';
 
 export default function Cart() {
@@ -56,11 +59,13 @@ export default function Cart() {
               total={total}
               selected={selected}
             />
-
+            <PaymentMethods />
           </div>
         ) : (
           <Empty />
         )}
+        <ProductsSwiper products={women_swiper} />
+
       </div>
     </>
 
