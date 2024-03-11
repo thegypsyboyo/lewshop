@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from "./styles.module.scss"
 
-export default function Checkout({ subtotal, shippingFee, total }) {
+export default function Checkout({ subtotal, shippingFee, total, selected }) {
     return (
         <div className={`${styles.cart__checkout} ${styles.card}`}>
             <h2>Order Summery</h2>
@@ -15,10 +15,11 @@ export default function Checkout({ subtotal, shippingFee, total }) {
             </div>
             <div className={styles.cart__checkout_total}>
                 <span>Total</span>
-                <span>US{total}$</span>
+                <span>USD{total}$</span>
             </div>
             <div className={styles.submit}>
-                <button
+                <button disabled={selected.length == 0}
+                style={{ background: `${selected.length == 0 ? "#eee": ""}`, cursor: `${selected.length == 0 ? "not-allowed": ""}`}}
                 >
                     Continue
                 </button>

@@ -10,9 +10,22 @@ import { useEffect, useState } from 'react';
 
 export default function Cart() {
 
+  const { cart } = useSelector((state) => ({ ...state }));
+
   const [selected, setSelected] = useState([]);
 
-  const { cart } = useSelector((state) => ({ ...state }));
+  const [shippingFee, setShippingFee] = useState(0);
+  const [subTotal, setSubTotal] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    setShippingFee(selected.reduce((a, c) => a + c.shipping, 0).toFixed(2));
+    setSubTotal(selected.reduce((a, c) => a + c.price * c.qty, 0).toFixed(2));
+    setTotal(selected.reduce((a, c) => a + c.price * c.qty, 0).toFixed(2));
+
+  }, [selected])
+
+
 
   // const slice = [];
   console.log("selected", selected)
@@ -37,7 +50,13 @@ export default function Cart() {
                 />
               ))}
             </div>
-            <Checkout subtotal="5000" />
+            <Checkout
+              subtotal={subTotal}
+              shippingFee={shippingFee}
+              total={total}
+              selected={selected}
+            />
+
           </div>
         ) : (
           <Empty />
