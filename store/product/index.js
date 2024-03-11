@@ -4,11 +4,13 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCart } from "../../store/cartSlice";
+import { useEffect, useState } from "react";
 
 
-export default function Product({ product }) {
-  
-    const { cart } = useSelector((state) => ({ ...state}))
+export default function Product({ product, selected, setSelected }) {
+
+    const [active, setActive] = useState();
+    const { cart } = useSelector((state) => ({ ...state }))
 
     const dispatch = useDispatch();
 
@@ -17,7 +19,7 @@ export default function Product({ product }) {
             if (p._uid == product._uid) {
                 return {
                     ...p,
-                    qty: type == "plus" ? product.qty + 1: product.qty - 1,
+                    qty: type == "plus" ? product.qty + 1 : product.qty - 1,
                 };
             }
             return p;
@@ -34,6 +36,20 @@ export default function Product({ product }) {
         dispatch(updateCart(newCart));
     }
 
+    useEffect(() => {
+        const check = selected.find((p) => p._uid == product._uid);
+
+        setActive(check);
+    }, [product._uid, selected]);
+
+    const handleSelect = () => {
+        // const check = selected.find((p) => p._uid == product._uid);
+        if (active) {
+            setSelected(selected.filter((p) => p._uid !== product._uid));
+        } else {
+            setSelected([...selected, product]);
+        }
+    }
     return (
         <div className={`${styles.card} ${styles.product}`}>
             {product.quantity < 1 && <div className={styles.blur}></div>}
@@ -42,7 +58,7 @@ export default function Product({ product }) {
                 LEWMETA Official store
             </div>
             <div className={styles.product__image}>
-                <div className={styles.checkbox}>
+                <div className={`${styles.checkbox}  ${active ? styles.active : ""}`} onClick={() => handleSelect()}>
                 </div>
                 <img src={product.images[0].url} alt="" />
                 <div className={styles.col}>
@@ -56,9 +72,9 @@ export default function Product({ product }) {
                         <div style={{ zIndex: "2" }}>
                             <BsHeart />
                         </div>
-                        <div 
-                        style={{ zIndex: "2" }}
-                        onClick={() => removeProduct(product._uid)} 
+                        <div
+                            style={{ zIndex: "2" }}
+                            onClick={() => removeProduct(product._uid)}
                         >
                             <AiOutlineDelete />
                         </div>
@@ -85,14 +101,14 @@ export default function Product({ product }) {
                         </div>
                         <div className={styles.product__priceQty_qty}>
                             <button disabled={product.qty < 2}
-                            onClick={() => updateQty("minus")}
+                                onClick={() => updateQty("minus")}
                             >
                                 -
                             </button>
                             <span>{product.qty}</span>
-                            <button 
-                            disabled={product.qty == product.quantity}
-                            onClick={() => updateQty("plus")}
+                            <button
+                                disabled={product.qty == product.quantity}
+                                onClick={() => updateQty("plus")}
                             >
                                 +
                             </button>
