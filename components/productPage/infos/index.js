@@ -8,11 +8,19 @@ import { BsHandbagFill, BsHeart } from 'react-icons/bs';
 import Share from "../share"
 import Accordian from './Accordian';
 import SimillarSwiper from './SimillarSwiper';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { addToCart, updateCart } from "../../../store/cartSlice"
 
 export default function Infos({ product, setActiveImg }) {
     const router = useRouter();
+    const dispatch = useDispatch();
+
     const [size, setSize] = useState(router.query.size);
     const [qty, setQty] = useState(1);
+    const [error, setError] = useState("");
+    const { cart } = useSelector((state) => ({ ...state }));
 
     useEffect(() => {
         setSize("");
@@ -25,6 +33,48 @@ export default function Infos({ product, setActiveImg }) {
         }
     }, [product.quantity, qty, router.query.size, router.query.style])
 
+    const addToCartHandler = async () => {
+        if (!router.query.size) {
+            setError("Please select a size!");
+            return
+        }
+        const { data } = await axios.get(
+            `/api/product/${product._id}?style=${product.style}&size=${router.query.size}`
+        )
+        if (qty > data.quantity) {
+            setError(
+                "The Quantity you have chosen is more than in  stock. Try and lower the quantity"
+            );
+        } else if (data.quantity < 1) {
+            setError("This product is out of stock!");
+            return;
+        } 
+        else {
+            let _uid = `${data._id}_${product.style}_${router.query.size}`
+            let exist = cart.cartItems.find((p) => p._uid === _uid);
+            if (exist) {
+                // update cart
+                let newCart = cart.cartItems.map((p) => {
+                    if (p._uid == exist._uid) {
+                        return { ...p, qty:qty}
+                    }
+                    console.log("New cart:", newCart)
+                    return p;
+                })
+                dispatch(updateCart(newCart));
+            } else {
+                dispatch(
+                    addToCart({
+                        ...data,
+                        qty,
+                        size: data.size,
+                        _uid,
+                    }))
+            }
+        }
+
+        console.log("Data ------->", data)
+    }
     return (
         <div className={styles.infos}>
             <div className={styles.infos__container}>
@@ -94,7 +144,7 @@ export default function Infos({ product, setActiveImg }) {
                         product.colors.map((color, i) => (
                             <span
                                 key={1}
-                                className={i == router.query.style ? styles.active__color : "" }
+                                className={i == router.query.style ? styles.active__color : ""}
                                 onMouseEnter={() => setActiveImg(product.subProducts[i].images[0].url)}
                                 onMouseLeave={() => setActiveImg("")}
                             >
@@ -107,29 +157,30 @@ export default function Infos({ product, setActiveImg }) {
                 </div>
                 <div className={styles.infos__qty}>
                     <button onClick={() => qty > 1 && setQty((prev) => prev - 1)}>
-                        <TbMinus/>
+                        <TbMinus />
                     </button>
                     <span>{qty}</span>
                     <button onClick={() => qty < product.quantity && setQty((prev) => prev + 1)}>
-                        <TbPlus/>
+                        <TbPlus />
                     </button>
                 </div>
                 <div className={styles.infos__actions}>
-                    <button 
+                    <button
                         disabled={product.quantity < 1}
-                        style={{ cursor: `${product.quantity < 1 ? "not allowed": ""}`}}
-
+                        style={{ cursor: `${product.quantity < 1 ? "not allowed" : ""}` }}
+                        onClick={() => addToCartHandler()}
                     >
                         <BsHandbagFill />
                         <b>ADD TO CART</b>
                     </button>
                     <button >
-                        <BsHeart/>
+                        <BsHeart />
                         WISHLIST
                     </button>
                 </div>
+                {error && <span className={styles.error}>{error}</span>}
                 <Share />
-                <Accordian details={[product.description, ...product.details]}/>
+                <Accordian details={[product.description, ...product.details]} />
                 <SimillarSwiper />
             </div>
         </div>
